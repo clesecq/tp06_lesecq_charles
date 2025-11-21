@@ -1,0 +1,53 @@
+# Exported from Render on 2025-11-21T17:39:05Z
+version: "1"
+projects:
+- name: tp
+  environments:
+  - name: Production
+    databases:
+    - name: tp04-db
+      databaseName: tp04
+      user: tp04
+      plan: free
+      region: frankfurt
+      ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+      postgresMajorVersion: "17"
+    services:
+    - type: web
+      name: tp06_lesecq_charles
+      runtime: static
+      repo: https://github.com/clesecq/tp06_lesecq_charles
+      buildCommand: pnpm install && pnpm build
+      staticPublishPath: dist/tp/browser
+      routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+      autoDeployTrigger: commit
+      rootDir: front
+    - type: web
+      name: tp_api_lesecq_charles
+      runtime: node
+      repo: https://github.com/clesecq/tp06_lesecq_charles
+      plan: free
+      envVars:
+      - key: DB_USER
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: ACCESS_TOKEN_SECRET
+        sync: false
+      region: frankfurt
+      buildCommand: pnpm install && pnpm build
+      startCommand: pnpm start
+      autoDeployTrigger: commit
+      rootDir: api
+
